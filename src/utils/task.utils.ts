@@ -1,5 +1,3 @@
-import { KanbanTask } from '@/components/KanbanBoard/KanbanBoard.types';
-
 export const isOverdue = (dueDate: Date): boolean => {
   return new Date() > dueDate;
 };
@@ -25,4 +23,3 @@ export const getPriorityColor = (priority?: string): string => {
   
   return colors[priority as keyof typeof colors] || '';
 };
-

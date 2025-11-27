@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { KanbanColumn as ColumnType, KanbanTask } from './KanbanBoard.types';
 import { KanbanCard } from './KanbanCard';
 import clsx from 'clsx';
@@ -52,7 +52,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
             No tasks
           </div>
         ) : (
-          tasks.map((task, index) => (
+          tasks.map((task) => (
             <KanbanCard
               key={task.id}
               task={task}
@@ -75,4 +75,3 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
     </div>
   );
 });
-

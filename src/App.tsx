@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { KanbanBoard } from './components/KanbanBoard/KanbanBoard';
 import { KanbanColumn, KanbanTask } from './components/KanbanBoard/KanbanBoard.types';
-import { moveTaskBetweenColumns, reorderTasks } from './utils/column.utils';
+import { moveTaskBetweenColumns } from './utils/column.utils';
 
 const initialColumns: KanbanColumn[] = [
   { id: 'todo', title: 'To Do', color: '#6b7280', taskIds: ['task-1', 'task-2'] },

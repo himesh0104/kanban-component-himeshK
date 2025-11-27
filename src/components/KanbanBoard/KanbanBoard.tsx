@@ -8,7 +8,6 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   columns,
   tasks,
   onTaskMove,
-  onTaskCreate,
   onTaskUpdate,
   onTaskDelete,
 }) => {
@@ -43,22 +42,30 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
     setDragOverColumn(columnId);
   }, []);
 
-  const handleColumnDrop = useCallback((e: React.DragEvent, columnId: string) => {
-    e.preventDefault();
-    if (draggedTaskId) {
-      const sourceColumn = columns.find(col => col.taskIds.includes(draggedTaskId));
-      if (sourceColumn && sourceColumn.id !== columnId) {
-        const sourceIndex = sourceColumn.taskIds.indexOf(draggedTaskId);
-        const destColumn = columns.find(col => col.id === columnId);
-        if (destColumn) {
-          onTaskMove(draggedTaskId, sourceColumn.id, columnId, destColumn.taskIds.length);
+  const handleColumnDrop = useCallback(
+    (e: React.DragEvent, columnId: string) => {
+      e.preventDefault();
+      if (draggedTaskId) {
+        const sourceColumn = columns.find(col => col.taskIds.includes(draggedTaskId));
+        if (sourceColumn && sourceColumn.id !== columnId) {
+          // removed unused sourceIndex
+          const destColumn = columns.find(col => col.id === columnId);
+          if (destColumn) {
+            onTaskMove(
+              draggedTaskId,
+              sourceColumn.id,
+              columnId,
+              destColumn.taskIds.length
+            );
+          }
         }
       }
-    }
-    setDragOverColumn(null);
-    setDraggedTaskId(null);
-    dragState.handleDragEnd();
-  }, [draggedTaskId, columns, onTaskMove, dragState]);
+      setDragOverColumn(null);
+      setDraggedTaskId(null);
+      dragState.handleDragEnd();
+    },
+    [draggedTaskId, columns, onTaskMove, dragState]
+  );
 
   return (
     <div className="p-6">
@@ -67,7 +74,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
           const columnTasks = column.taskIds
             .map(id => tasks[id])
             .filter(Boolean);
-          
+
           return (
             <KanbanColumn
               key={column.id}
@@ -76,8 +83,8 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
               onAddTask={() => handleAddTask(column.id)}
               onTaskClick={handleTaskClick}
               isDragOver={dragOverColumn === column.id}
-              onDragOver={(e) => handleColumnDragOver(e, column.id)}
-              onDrop={(e) => handleColumnDrop(e, column.id)}
+              onDragOver={e => handleColumnDragOver(e, column.id)}
+              onDrop={e => handleColumnDrop(e, column.id)}
               onTaskDragStart={handleDragStart}
               onTaskDragEnd={handleDragEnd}
               draggedTaskId={draggedTaskId}
@@ -97,4 +104,3 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
     </div>
   );
 };
-
