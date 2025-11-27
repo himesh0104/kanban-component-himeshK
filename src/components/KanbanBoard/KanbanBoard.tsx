@@ -19,6 +19,8 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   const dragState = useDragAndDrop();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createColumnId, setCreateColumnId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<"all" | "low" | "medium" | "high" | "urgent">("all");
   const handleAddTask = useCallback((columnId: string) => {
     setCreateColumnId(columnId);
     setCreateModalOpen(true);
@@ -75,9 +77,45 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
 
   return (
     <div className="p-6">
+      <div className="flex items-center gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search tasks…"
+          className="border p-2 rounded w-64"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        <select
+          className="border p-2 rounded"
+          value={priorityFilter}
+          onChange={(e) =>
+            setPriorityFilter(e.target.value as "all" | "low" | "medium" | "high" | "urgent")
+          }
+        >
+          <option value="all">All Priorities</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map(column => {
-          const columnTasks = column.taskIds.map(id => tasks[id]).filter(Boolean);
+          const columnTasks = column.taskIds
+            .map(id => tasks[id])
+            .filter(Boolean)
+            .filter(task => {
+              const matchesSearch =
+                task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (task.description ?? "").toLowerCase().includes(searchQuery.toLowerCase());
+
+              const matchesPriority =
+                priorityFilter === "all" || task.priority === priorityFilter;
+
+              return matchesSearch && matchesPriority;
+            });
 
           return (
             <KanbanColumn
