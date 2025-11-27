@@ -3,6 +3,7 @@ import { KanbanViewProps, KanbanTask } from './KanbanBoard.types';
 import { KanbanColumn } from './KanbanColumn';
 import { TaskModal } from './TaskModal';
 import { useDragAndDrop } from '@/hooks/useDragAndDrop';
+import { CreateTaskModal } from './CreateTaskModal';
 
 export const KanbanBoard: React.FC<KanbanViewProps> = ({
   columns,
@@ -16,32 +17,25 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const dragState = useDragAndDrop();
-
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createColumnId, setCreateColumnId] = useState<string | null>(null);
   const handleAddTask = useCallback((columnId: string) => {
-  const newTask: KanbanTask = {
-    id: `task-${Date.now()}`,
-    title: 'New Task',
-    description: '',
-    status: columnId,
-    priority: 'low',
-    assignee: '',
-    tags: [],
-    createdAt: new Date(),
-  };
-
-  onTaskCreate(columnId, newTask);
-}, [onTaskCreate]);
-
+    setCreateColumnId(columnId);
+    setCreateModalOpen(true);
+  }, []);
 
   const handleTaskClick = useCallback((task: KanbanTask) => {
     setSelectedTask(task);
   }, []);
 
-  const handleDragStart = useCallback((e: React.DragEvent, taskId: string) => {
-    setDraggedTaskId(taskId);
-    dragState.handleDragStart(taskId);
-    e.dataTransfer.effectAllowed = 'move';
-  }, [dragState]);
+  const handleDragStart = useCallback(
+    (e: React.DragEvent, taskId: string) => {
+      setDraggedTaskId(taskId);
+      dragState.handleDragStart(taskId);
+      e.dataTransfer.effectAllowed = 'move';
+    },
+    [dragState]
+  );
 
   const handleDragEnd = useCallback(() => {
     setDraggedTaskId(null);
@@ -61,7 +55,6 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
       if (draggedTaskId) {
         const sourceColumn = columns.find(col => col.taskIds.includes(draggedTaskId));
         if (sourceColumn && sourceColumn.id !== columnId) {
-          // removed unused sourceIndex
           const destColumn = columns.find(col => col.id === columnId);
           if (destColumn) {
             onTaskMove(
@@ -84,9 +77,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
     <div className="p-6">
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map(column => {
-          const columnTasks = column.taskIds
-            .map(id => tasks[id])
-            .filter(Boolean);
+          const columnTasks = column.taskIds.map(id => tasks[id]).filter(Boolean);
 
           return (
             <KanbanColumn
@@ -114,6 +105,15 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
         onDelete={onTaskDelete}
         columns={columns}
       />
+      
+      {createModalOpen && createColumnId && (
+        <CreateTaskModal
+          isOpen={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          onCreate={onTaskCreate}
+          columnId={createColumnId}
+        />
+      )}
     </div>
   );
 };
