@@ -8,6 +8,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   columns,
   tasks,
   onTaskMove,
+  onTaskCreate,
   onTaskUpdate,
   onTaskDelete,
 }) => {
@@ -17,8 +18,20 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   const dragState = useDragAndDrop();
 
   const handleAddTask = useCallback((columnId: string) => {
-    console.log('add task to', columnId);
-  }, []);
+  const newTask: KanbanTask = {
+    id: `task-${Date.now()}`,
+    title: 'New Task',
+    description: '',
+    status: columnId,
+    priority: 'low',
+    assignee: '',
+    tags: [],
+    createdAt: new Date(),
+  };
+
+  onTaskCreate(columnId, newTask);
+}, [onTaskCreate]);
+
 
   const handleTaskClick = useCallback((task: KanbanTask) => {
     setSelectedTask(task);
