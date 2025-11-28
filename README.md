@@ -4,7 +4,7 @@ A production-ready Kanban Board component built with React, TypeScript, and Tail
 
 ## 🚀 Live Storybook
 
-[Deploy your Storybook and add the link here]
+https://kanban-component-himesh-k.vercel.app/
 
 ## 📦 Installation
 

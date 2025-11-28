@@ -16,6 +16,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [draggedColumnId, setDraggedColumnId] = useState<string | null>(null);
   const dragState = useDragAndDrop();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createColumnId, setCreateColumnId] = useState<string | null>(null);
@@ -75,6 +76,40 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
     [draggedTaskId, columns, onTaskMove, dragState]
   );
 
+  const handleColumnDragStart = useCallback((e: React.DragEvent, columnId: string) => {
+    setDraggedColumnId(columnId);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleColumnDragOver2 = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleColumnDrop2 = useCallback(
+    (e: React.DragEvent, targetColumnId: string) => {
+      e.preventDefault();
+
+      if (!draggedColumnId || draggedColumnId === targetColumnId) return;
+
+      const srcIndex = columns.findIndex(col => col.id === draggedColumnId);
+      const destIndex = columns.findIndex(col => col.id === targetColumnId);
+
+      if (srcIndex === -1 || destIndex === -1) return;
+
+      const newColumns = [...columns];
+      const [removed] = newColumns.splice(srcIndex, 1);
+      newColumns.splice(destIndex, 0, removed);
+
+      onTaskMove("__reorder_columns__", "", "", 0);
+      
+      (columns as any).splice(0, columns.length, ...newColumns);
+
+      setDraggedColumnId(null);
+    },
+    [draggedColumnId, columns, onTaskMove]
+  );
+
   return (
     <div className="p-6">
       <div className="flex items-center gap-4 mb-4">
@@ -118,19 +153,30 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
             });
 
           return (
-            <KanbanColumn
+            <div
               key={column.id}
-              column={column}
-              tasks={columnTasks}
-              onAddTask={() => handleAddTask(column.id)}
-              onTaskClick={handleTaskClick}
-              isDragOver={dragOverColumn === column.id}
-              onDragOver={e => handleColumnDragOver(e, column.id)}
-              onDrop={e => handleColumnDrop(e, column.id)}
-              onTaskDragStart={handleDragStart}
-              onTaskDragEnd={handleDragEnd}
-              draggedTaskId={draggedTaskId}
-            />
+              draggable
+              onDragStart={(e) => handleColumnDragStart(e, column.id)}
+              onDragOver={handleColumnDragOver2}
+              onDrop={(e) => handleColumnDrop2(e, column.id)}
+              className="transition-opacity"
+              style={{
+                opacity: draggedColumnId === column.id ? 0.5 : 1,
+              }}
+            >
+              <KanbanColumn
+                column={column}
+                tasks={columnTasks}
+                onAddTask={() => handleAddTask(column.id)}
+                onTaskClick={handleTaskClick}
+                isDragOver={dragOverColumn === column.id}
+                onDragOver={e => handleColumnDragOver(e, column.id)}
+                onDrop={e => handleColumnDrop(e, column.id)}
+                onTaskDragStart={handleDragStart}
+                onTaskDragEnd={handleDragEnd}
+                draggedTaskId={draggedTaskId}
+              />
+            </div>
           );
         })}
       </div>
