@@ -99,10 +99,20 @@ export const KanbanCard = React.memo<KanbanCardProps>(({
 
   return (
     <div
+      data-task-card
       draggable
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
+      onDragStart={e => {
+        e.stopPropagation();
+        onDragStart?.(e);
+      }}
+      onDragEnd={e => {
+        e.stopPropagation();
+        onDragEnd?.(e);
+      }}
+      onDragOver={e => {
+        e.stopPropagation();
+        onDragOver?.(e);
+      }}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       onFocus={onFocusCard}

@@ -75,6 +75,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   }, []);
 
   const handleDragStart = useCallback((e: React.DragEvent, taskId: string) => {
+    e.stopPropagation();
     setDraggedTaskId(taskId);
     e.dataTransfer.effectAllowed = 'move';
   }, []);
@@ -128,6 +129,10 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   );
 
   const handleColumnDragStart = useCallback((e: React.DragEvent, columnId: string) => {
+    if ((e.target as HTMLElement).closest('[data-task-card]')) {
+      e.preventDefault();
+      return;
+    }
     setDraggedColumnId(columnId);
     e.dataTransfer.effectAllowed = 'move';
   }, []);
@@ -228,13 +233,6 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
           {filteredColumns.map(({ column, tasks: columnTasks }) => (
             <div
               key={column.id}
-              draggable
-              onDragStart={e => handleColumnDragStart(e, column.id)}
-              onDragOver={e => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-              }}
-              onDrop={e => handleColumnDrop2(e, column.id)}
               className="transition-opacity flex-shrink-0"
               style={{
                 opacity: draggedColumnId === column.id ? 0.5 : 1,
@@ -248,14 +246,27 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
                 onTaskClick={handleTaskClick}
                 isDragOver={dragOverColumn === column.id}
                 dragOverIndex={dragOverColumn === column.id ? dragOverIndex : null}
-                onDragOver={e => handleColumnDragOver(e, column.id)}
-                onTaskDragOver={(e, index) => handleColumnDragOver(e, column.id, index)}
-                onDrop={e => handleColumnDrop(e, column.id)}
+                onDragOver={e => {
+                  if (!(e.target as HTMLElement).closest('[data-task-card]')) {
+                    handleColumnDragOver(e, column.id);
+                  }
+                }}
+                onTaskDragOver={(e, index) => {
+                  e.stopPropagation();
+                  handleColumnDragOver(e, column.id, index);
+                }}
+                onDrop={e => {
+                  if (!(e.target as HTMLElement).closest('[data-task-card]')) {
+                    handleColumnDrop(e, column.id);
+                  }
+                }}
                 onTaskDragStart={handleDragStart}
                 onTaskDragEnd={handleDragEnd}
                 draggedTaskId={draggedTaskId}
                 keyboardDrag={keyboardDrag.isDragging ? keyboardDrag : undefined}
                 theme={theme}
+                onColumnDragStart={e => handleColumnDragStart(e, column.id)}
+                onColumnDrop={e => handleColumnDrop2(e, column.id)}
               />
             </div>
           ))}

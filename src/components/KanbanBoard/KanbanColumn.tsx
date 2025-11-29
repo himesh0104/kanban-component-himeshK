@@ -26,6 +26,8 @@ interface KanbanColumnProps {
     startDrag: (taskId: string) => void;
   };
   searchQuery?: string;
+  onColumnDragStart?: (e: React.DragEvent) => void;
+  onColumnDrop?: (e: React.DragEvent) => void;
 }
 
 const WIP_WARNING_THRESHOLD = 0.8;
@@ -54,6 +56,8 @@ export const KanbanColumn = React.memo<KanbanColumnProps>(({
   draggedTaskId,
   keyboardDrag,
   searchQuery,
+  onColumnDragStart,
+  onColumnDrop,
 }) => {
   const isDark = theme === 'dark';
   const shouldVirtualize = tasks.length > VIRTUALIZATION_THRESHOLD;
@@ -90,9 +94,30 @@ export const KanbanColumn = React.memo<KanbanColumnProps>(({
           onEdit={() => onTaskClick(task)}
           isDragging={draggedTaskId === task.id}
           isKeyboardDragging={isKeyboardDragging}
-          onDragStart={onTaskDragStart ? e => onTaskDragStart(e, task.id) : undefined}
-          onDragEnd={onTaskDragEnd}
-          onDragOver={onTaskDragOver ? e => onTaskDragOver(e, index) : undefined}
+          onDragStart={
+            onTaskDragStart
+              ? e => {
+                  e.stopPropagation();
+                  onTaskDragStart(e, task.id);
+                }
+              : undefined
+          }
+          onDragEnd={
+            onTaskDragEnd
+              ? e => {
+                  e.stopPropagation();
+                  onTaskDragEnd();
+                }
+              : undefined
+          }
+          onDragOver={
+            onTaskDragOver
+              ? e => {
+                  e.stopPropagation();
+                  onTaskDragOver(e, index);
+                }
+              : undefined
+          }
           onKeyboardDragStart={keyboardDrag ? () => keyboardDrag.startDrag(task.id) : undefined}
           theme={theme}
           searchQuery={searchQuery}
@@ -146,12 +171,41 @@ export const KanbanColumn = React.memo<KanbanColumnProps>(({
           : 'bg-neutral-100 text-neutral-900 border border-transparent',
         isDragOver && 'ring-2 ring-primary-500 transform scale-[1.01]'
       )}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
+      onDragOver={e => {
+        if (!(e.target as HTMLElement).closest('[data-task-card]')) {
+          onDragOver?.(e);
+        }
+      }}
+      onDrop={e => {
+        if (!(e.target as HTMLElement).closest('[data-task-card]')) {
+          onDrop?.(e);
+        }
+      }}
       role="region"
       aria-label={`${column.title} column. ${tasks.length} tasks.`}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div
+        className="flex items-center justify-between mb-4"
+        draggable
+        onDragStart={e => {
+          e.stopPropagation();
+          onColumnDragStart?.(e);
+        }}
+        onDragOver={e => {
+          if (!(e.target as HTMLElement).closest('[data-task-card]')) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+          }
+        }}
+        onDrop={e => {
+          if (!(e.target as HTMLElement).closest('[data-task-card]')) {
+            e.preventDefault();
+            e.stopPropagation();
+            onColumnDrop?.(e);
+          }
+        }}
+        style={{ cursor: 'grab' }}
+      >
         <h3 className="font-semibold">{column.title}</h3>
         <div className="flex items-center gap-2">
           <span
