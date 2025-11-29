@@ -9,6 +9,7 @@ export interface KanbanTask {
   createdAt: Date;
   dueDate?: Date;
   history?: { message: string; timestamp: Date }[];
+  updatedAt?: Date;
 }
 
 export interface KanbanColumn {
@@ -26,5 +27,8 @@ export interface KanbanViewProps {
   onTaskCreate: (columnId: string, task: KanbanTask) => void;
   onTaskUpdate: (taskId: string, updates: Partial<KanbanTask>) => void;
   onTaskDelete: (taskId: string) => void;
+  onColumnsReorder?: (columns: KanbanColumn[]) => void;
+  initialTheme?: 'light' | 'dark';
+  initialSearchQuery?: string;
+  initialPriorityFilter?: 'all' | 'low' | 'medium' | 'high' | 'urgent';
 }
-

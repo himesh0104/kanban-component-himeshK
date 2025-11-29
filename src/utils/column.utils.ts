@@ -1,9 +1,5 @@
-export const reorderTasks = (
-  tasks: string[],
-  startIndex: number,
-  endIndex: number
-): string[] => {
-  const result = Array.from(tasks);
+export const reorderTasks = (tasks: string[], startIndex: number, endIndex: number): string[] => {
+  const result = [...tasks];
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
   return result;
@@ -15,8 +11,8 @@ export const moveTaskBetweenColumns = (
   sourceIndex: number,
   destIndex: number
 ): { source: string[]; destination: string[] } => {
-  const sourceClone = Array.from(sourceColumn);
-  const destClone = Array.from(destColumn);
+  const sourceClone = [...sourceColumn];
+  const destClone = [...destColumn];
   const [removed] = sourceClone.splice(sourceIndex, 1);
   destClone.splice(destIndex, 0, removed);
   return {
@@ -24,4 +20,3 @@ export const moveTaskBetweenColumns = (
     destination: destClone,
   };
 };
-

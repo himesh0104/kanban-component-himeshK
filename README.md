@@ -2,18 +2,18 @@
 
 A production-ready Kanban Board component built with React, TypeScript, and Tailwind CSS. This component provides a fully functional drag-and-drop task management interface with comprehensive accessibility support.
 
-## 🚀 Live Storybook
+## Live Storybook
 
 https://kanban-component-himesh-k.vercel.app/
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install
 npm run storybook
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 The component is built with a modular architecture:
 
@@ -22,21 +22,45 @@ The component is built with a modular architecture:
 - **Utils**: Utility functions for task and column operations
 - **Types**: TypeScript interfaces for type safety
 
-## ✨ Features
+## Features
 
-- [x] Drag-and-drop tasks between columns
+### Core Functionality
+- [x] Drag-and-drop tasks between columns with visual feedback
+- [x] Drop tasks between specific positions within columns
+- [x] Keyboard drag support (Shift+Space to pick up, arrows to move, Enter to drop)
 - [x] Task creation and editing via modal
-- [x] Task deletion
-- [x] Priority indicators with color coding
-- [x] Assignee avatars with initials
-- [x] Tag badges
-- [x] Due date display with overdue highlighting
-- [x] Responsive design (mobile, tablet, desktop)
-- [x] Keyboard navigation support
-- [x] ARIA labels and accessibility features
-- [x] Performance optimizations with React.memo
+- [x] Task deletion with confirmation
+- [x] Column reordering via drag-and-drop
 
-## 📚 Storybook Stories
+### Task Management
+- [x] Priority indicators with color coding (low, medium, high, urgent)
+- [x] Assignee management with searchable dropdown
+- [x] Tag management (add/remove tags)
+- [x] Due date picker with overdue highlighting
+- [x] Task history/activity log
+
+### Performance & UX
+- [x] Virtual scrolling for large task lists (20+ tasks)
+- [x] Debounced search (200ms)
+- [x] WIP (Work In Progress) limit indicators
+- [x] Search and filter tasks by text and priority
+- [x] Responsive design (mobile, tablet, desktop)
+- [x] Dark mode support with persistence
+
+### Accessibility
+- [x] Full keyboard navigation support
+- [x] ARIA labels and roles throughout
+- [x] WCAG 2.1 AA compliant
+- [x] Focus management and indicators
+- [x] Screen reader support
+
+### Technical
+- [x] React.memo for performance optimization
+- [x] Custom hooks for reusable logic
+- [x] TypeScript strict mode
+- [x] Optimized re-renders
+
+## Storybook Stories
 
 The component includes comprehensive Storybook stories:
 
@@ -44,18 +68,27 @@ The component includes comprehensive Storybook stories:
 - **Empty** - Empty board state
 - **Large Dataset** - Board with 30+ tasks to test performance
 - **Mobile View** - Responsive layout demonstration
+- **Different Priorities** - Showcases all priority levels with color coding
+- **Interactive Demo** - Fully functional playground
+- **Accessibility** - Keyboard navigation and ARIA demonstration
 
-## 🛠️ Technologies
+## Technologies
 
-- React 18
-- TypeScript 5
-- Tailwind CSS 3
-- Storybook 7
-- Vite
-- date-fns (date formatting)
-- clsx (conditional classes)
+- **React 18** - Component framework
+- **TypeScript 5** - Type safety with strict mode
+- **Tailwind CSS 3** - Utility-first styling
+- **Storybook 7** - Component documentation
+- **Vite** - Build tooling
+- **date-fns** - Date formatting utilities
+- **clsx** - Conditional class management
 
-## 📝 Usage
+### Custom Hooks
+- `useKeyboardDrag` - Keyboard-based drag and drop
+- `useVirtualizedList` - Virtual scrolling for performance
+- `useDebounce` - Debounced values for search
+- `useDragAndDrop` - Mouse drag state management
+
+## Usage
 
 ```tsx
 import { KanbanBoard } from './components/KanbanBoard/KanbanBoard';
@@ -85,7 +118,7 @@ const tasks = {
 />
 ```
 
-## ♿ Accessibility
+## Accessibility
 
 The component follows WCAG 2.1 AA standards:
 
@@ -94,7 +127,7 @@ The component follows WCAG 2.1 AA standards:
 - Focus indicators
 - Screen reader support
 
-## 🎨 Design
+## Design
 
 Built with Tailwind CSS using a custom design system:
 
@@ -103,7 +136,6 @@ Built with Tailwind CSS using a custom design system:
 - Consistent spacing scale
 - Subtle shadows and transitions
 
-## 📄 License
+## License
 
 MIT
-
