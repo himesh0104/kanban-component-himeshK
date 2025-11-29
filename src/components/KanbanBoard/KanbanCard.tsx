@@ -10,6 +10,7 @@ interface KanbanCardProps {
   isDragging?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
+  theme?: "light" | "dark";
 }
 
 export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
@@ -18,6 +19,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
   isDragging = false,
   onDragStart,
   onDragEnd,
+  theme = 'light',
 }) => {
   const priorityColor = getPriorityColor(task.priority);
   const overdue = task.dueDate ? isOverdue(task.dueDate) : false;
@@ -41,24 +43,25 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
       aria-label={`${task.title}. Status: ${task.status}. Priority: ${task.priority || 'none'}. Press space or enter to edit.`}
       aria-grabbed={isDragging}
       className={clsx(
-        'bg-white border rounded-lg p-3 shadow-card hover:shadow-card-hover transition-shadow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+        theme === 'dark' ? 'bg-neutral-700 text-neutral-100 border border-neutral-600' : 'bg-white',
         isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab',
+        'rounded-lg p-3 shadow-card hover:shadow-lg hover:-translate-y-0.5 transition-transform transition-shadow',
         priorityColor && `border-l-4 ${priorityColor}`
       )}
     >
       <div className="flex items-start justify-between mb-2">
-        <h4 className="font-medium text-sm text-neutral-900 line-clamp-2 flex-1">
+        <h4 className={clsx('font-medium text-sm line-clamp-2 flex-1', theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900')}>
           {task.title}
         </h4>
         {task.priority && (
-          <span className="text-xs px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 ml-2">
+          <span className={clsx('text-xs px-2 py-0.5 rounded ml-2', theme === 'dark' ? 'bg-neutral-700 text-neutral-200' : 'bg-neutral-100 text-neutral-700')}>
             {task.priority}
           </span>
         )}
       </div>
 
       {task.description && (
-        <p className="text-xs text-neutral-600 mb-2 line-clamp-2">
+        <p className={clsx('text-xs mb-2 line-clamp-2', theme === 'dark' ? 'text-neutral-300' : 'text-neutral-600')}>
           {task.description}
         </p>
       )}
@@ -68,7 +71,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
           {task.tags?.slice(0, 3).map(tag => (
             <span
               key={tag}
-              className="text-xs bg-neutral-100 px-2 py-0.5 rounded text-neutral-700"
+              className={clsx('text-xs px-2 py-0.5 rounded', theme === 'dark' ? 'bg-neutral-700 text-neutral-200' : 'bg-neutral-100 text-neutral-700')}
             >
               {tag}
             </span>

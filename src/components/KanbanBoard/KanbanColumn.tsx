@@ -8,6 +8,7 @@ interface KanbanColumnProps {
   tasks: KanbanTask[];
   onAddTask: () => void;
   onTaskClick: (task: KanbanTask) => void;
+  theme?: "light" | "dark";
   isDragOver?: boolean;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
@@ -21,6 +22,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
   tasks,
   onAddTask,
   onTaskClick,
+  theme = 'light',
   isDragOver = false,
   onDragOver,
   onDrop,
@@ -31,8 +33,11 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
   return (
     <div
       className={clsx(
-        'flex flex-col w-80 bg-neutral-100 rounded-lg p-4',
-        isDragOver && 'bg-neutral-200 ring-2 ring-primary-500'
+        'flex flex-col min-w-[20rem] flex-shrink-0 rounded-lg p-4 shadow-sm transition-all',
+        theme === 'dark'
+          ? 'bg-neutral-800 text-neutral-200 border border-neutral-700'
+          : 'bg-neutral-100 text-neutral-900 border border-transparent',
+        isDragOver && 'ring-2 ring-primary-500 transform scale-[1.01]'
       )}
       onDragOver={onDragOver}
       onDrop={onDrop}
@@ -40,15 +45,15 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       aria-label={`${column.title} column. ${tasks.length} tasks.`}
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-neutral-900">{column.title}</h3>
-        <span className="text-sm text-neutral-600" aria-label={`${tasks.length} tasks`}>
+        <h3 className="font-semibold">{column.title}</h3>
+        <span className={clsx('text-sm', theme === 'dark' ? 'text-neutral-400' : 'text-neutral-600')} aria-label={`${tasks.length} tasks`}>
           {tasks.length}
         </span>
       </div>
       
-      <div className="flex-1 min-h-[400px] space-y-2 overflow-y-auto">
+      <div className="flex-1 min-h-[320px] space-y-2 overflow-y-auto px-1">
         {tasks.length === 0 ? (
-          <div className="text-center text-neutral-500 text-sm py-8">
+          <div className={clsx('text-center text-sm py-8', theme === 'dark' ? 'text-neutral-400' : 'text-neutral-500')}>
             No tasks
           </div>
         ) : (
@@ -60,6 +65,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
               isDragging={draggedTaskId === task.id}
               onDragStart={onTaskDragStart ? (e) => onTaskDragStart(e, task.id) : undefined}
               onDragEnd={onTaskDragEnd}
+              theme={theme}
             />
           ))
         )}
@@ -67,7 +73,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       
       <button
         onClick={onAddTask}
-        className="mt-4 text-sm text-neutral-600 hover:text-neutral-900 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
+        className={clsx('mt-4 text-sm py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded', theme === 'dark' ? 'text-neutral-300 hover:text-neutral-100' : 'text-neutral-600 hover:text-neutral-900')}
         aria-label={`Add task to ${column.title} column`}
       >
         + Add task

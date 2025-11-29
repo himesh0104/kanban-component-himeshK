@@ -22,6 +22,19 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   const [createColumnId, setCreateColumnId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<"all" | "low" | "medium" | "high" | "urgent">("all");
+  const [theme, setTheme] = useState<"light" | "dark">(
+    (typeof window !== 'undefined' && localStorage.getItem('kanban-theme') === 'dark') ? 'dark' : 'light'
+  );
+
+  const toggleTheme = useCallback(() => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    try {
+      localStorage.setItem('kanban-theme', newTheme);
+    } catch (e) {
+      // ignore
+    }
+  }, [theme]);
   const handleAddTask = useCallback((columnId: string) => {
     setCreateColumnId(columnId);
     setCreateModalOpen(true);
@@ -111,32 +124,43 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
   );
 
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search tasks…"
-          className="border p-2 rounded w-64"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+    <div className={`p-6 transition-colors duration-300 min-h-screen ${theme === 'dark' ? 'bg-neutral-900 text-neutral-200' : 'bg-neutral-50 text-neutral-900'}`}>
+      <div className="max-w-[1200px] mx-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-lg font-semibold">Kanban Board</h1>
 
-        <select
-          className="border p-2 rounded"
-          value={priorityFilter}
-          onChange={(e) =>
-            setPriorityFilter(e.target.value as "all" | "low" | "medium" | "high" | "urgent")
-          }
-        >
-          <option value="all">All Priorities</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="urgent">Urgent</option>
-        </select>
-      </div>
+          <button
+            onClick={toggleTheme}
+            className="px-3 py-2 rounded-md border text-sm"
+          >
+            {theme === 'light' ? '🌙 Dark Mode' : '☀ Light Mode'}
+          </button>
+        </div>
+        <div className="flex items-center gap-4 mb-4">
+          <input
+            type="text"
+            placeholder="Search tasks…"
+            className="border p-2 rounded w-64 shadow-sm focus:ring-2 focus:ring-primary-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+          <select
+            className="border p-2 rounded shadow-sm focus:ring-2 focus:ring-primary-500"
+            value={priorityFilter}
+            onChange={(e) =>
+              setPriorityFilter(e.target.value as "all" | "low" | "medium" | "high" | "urgent")
+            }
+          >
+            <option value="all">All Priorities</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div className="flex gap-4 overflow-x-auto pb-4 items-start">
         {columns.map(column => {
           const columnTasks = column.taskIds
             .map(id => tasks[id])
@@ -159,9 +183,10 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
               onDragStart={(e) => handleColumnDragStart(e, column.id)}
               onDragOver={handleColumnDragOver2}
               onDrop={(e) => handleColumnDrop2(e, column.id)}
-              className="transition-opacity"
+              className="transition-opacity flex-shrink-0"
               style={{
                 opacity: draggedColumnId === column.id ? 0.5 : 1,
+                minWidth: '20rem'
               }}
             >
               <KanbanColumn
@@ -175,10 +200,12 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
                 onTaskDragStart={handleDragStart}
                 onTaskDragEnd={handleDragEnd}
                 draggedTaskId={draggedTaskId}
+                theme={theme}
               />
             </div>
           );
         })}
+        </div>
       </div>
 
       <TaskModal
@@ -188,6 +215,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
         onUpdate={onTaskUpdate}
         onDelete={onTaskDelete}
         columns={columns}
+        theme={theme}
       />
       
       {createModalOpen && createColumnId && (
@@ -196,6 +224,7 @@ export const KanbanBoard: React.FC<KanbanViewProps> = ({
           onClose={() => setCreateModalOpen(false)}
           onCreate={onTaskCreate}
           columnId={createColumnId}
+          theme={theme}
         />
       )}
     </div>

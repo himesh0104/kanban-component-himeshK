@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { KanbanTask } from "./KanbanBoard.types";
+import { Modal } from '../primitives/Modal';
 
 interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (columnId: string, task: KanbanTask) => void;
   columnId: string;
+  theme?: "light" | "dark";
 }
 
 export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
@@ -13,6 +15,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   onCreate,
   columnId,
+  theme = 'light',
 }) => {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<"low" | "medium" | "high" | "urgent">("medium");
@@ -38,63 +41,51 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={onClose}
-    >
-      <div className="absolute inset-0 bg-black/50" />
+    <Modal isOpen={isOpen} onClose={onClose} title="Create New Task" theme={theme}>
+      <div className="space-y-3">
+        <input
+          type="text"
+          placeholder="Task title"
+          className={"w-full border p-2 rounded " + (theme === 'dark' ? 'border-neutral-600 bg-neutral-700 text-neutral-100' : 'border-neutral-300 bg-white text-neutral-900')}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-      <div
-        className="bg-white p-6 rounded-xl shadow-lg relative w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-xl font-semibold mb-4">Create New Task</h2>
+        <textarea
+          placeholder="Description"
+          className={"w-full border p-2 rounded " + (theme === 'dark' ? 'border-neutral-600 bg-neutral-700 text-neutral-100' : 'border-neutral-300 bg-white text-neutral-900')}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-        <div className="space-y-3">
-          <input
-            type="text"
-            placeholder="Task title"
-            className="w-full border p-2 rounded"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+        <input
+          type="text"
+          placeholder="Assignee"
+          className={"w-full border p-2 rounded " + (theme === 'dark' ? 'border-neutral-600 bg-neutral-700 text-neutral-100' : 'border-neutral-300 bg-white text-neutral-900')}
+          value={assignee}
+          onChange={(e) => setAssignee(e.target.value)}
+        />
 
-          <textarea
-            placeholder="Description"
-            className="w-full border p-2 rounded"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+        <select
+          className={"w-full border p-2 rounded " + (theme === 'dark' ? 'border-neutral-600 bg-neutral-700 text-neutral-100' : 'border-neutral-300 bg-white text-neutral-900')}
+          value={priority}
+          onChange={(e) =>
+              setPriority(e.target.value as "low" | "medium" | "high" | "urgent")
+          }
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
 
-          <input
-            type="text"
-            placeholder="Assignee"
-            className="w-full border p-2 rounded"
-            value={assignee}
-            onChange={(e) => setAssignee(e.target.value)}
-          />
-
-          <select
-            className="w-full border p-2 rounded"
-            value={priority}
-            onChange={(e) =>
-                setPriority(e.target.value as "low" | "medium" | "high" | "urgent")
-            }
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-        </div>
-
-        <div className="flex justify-end gap-3 mt-6">
-          <button className="px-4 py-2 bg-neutral-200 rounded" onClick={onClose}>
+        <div className="flex justify-end gap-3 mt-2">
+          <button className={"px-4 py-2 rounded " + (theme === 'dark' ? 'bg-neutral-700 text-neutral-200 hover:bg-neutral-600' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300')} onClick={onClose}>
             Cancel
           </button>
 
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded"
+            className={"px-4 py-2 rounded " + (theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-700')}
             onClick={handleSubmit}
             disabled={!title.trim()}
           >
@@ -102,6 +93,6 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
