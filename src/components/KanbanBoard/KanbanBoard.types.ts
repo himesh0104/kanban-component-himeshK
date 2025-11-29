@@ -8,6 +8,7 @@ export interface KanbanTask {
   tags?: string[];
   createdAt: Date;
   dueDate?: Date;
+  history?: { message: string; timestamp: Date }[];
 }
 
 export interface KanbanColumn {

@@ -34,6 +34,9 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       assignee,
       tags: [],
       createdAt: new Date(),
+      history: [
+        { message: 'Created', timestamp: new Date() }
+      ],
     };
 
     onCreate(columnId, newTask);

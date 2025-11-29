@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KanbanTask } from './KanbanBoard.types';
 import { Modal } from '../primitives/Modal';
+import { format } from 'date-fns';
 
 interface TaskModalProps {
   task: KanbanTask | null;
@@ -38,12 +39,28 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   if (!task) return null;
 
   const handleSave = () => {
-    onUpdate(task.id, {
+    const updates: Partial<KanbanTask> = {
       title,
       description,
       priority,
       status,
-    });
+    };
+
+    const entries: { message: string; timestamp: Date }[] = [];
+    if (title !== task.title) entries.push({ message: `Title changed from "${task.title}" to "${title}"`, timestamp: new Date() });
+    if ((description || '') !== (task.description || '')) entries.push({ message: `Description updated`, timestamp: new Date() });
+    if (priority !== task.priority) entries.push({ message: `Priority changed from ${task.priority || 'none'} to ${priority}`, timestamp: new Date() });
+    if (status !== task.status) {
+      const from = columns.find(c => c.id === task.status)?.title || task.status;
+      const to = columns.find(c => c.id === status)?.title || status;
+      entries.push({ message: `Status moved from ${from} to ${to}`, timestamp: new Date() });
+    }
+
+    if (entries.length) {
+      updates.history = [ ...(task.history || []), ...entries ];
+    }
+
+    onUpdate(task.id, updates);
     onClose();
   };
 
@@ -133,6 +150,21 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           >
             Cancel
           </button>
+        </div>
+        <div className="mt-4 border-t pt-3">
+          <h4 className={"text-sm font-medium mb-2 " + (theme === 'dark' ? 'text-neutral-200' : 'text-neutral-700')}>History</h4>
+          {(!task.history || task.history.length === 0) ? (
+            <div className={theme === 'dark' ? 'text-neutral-400 text-sm' : 'text-neutral-500 text-sm'}>No history</div>
+          ) : (
+            <ul className="space-y-2 max-h-40 overflow-y-auto text-sm">
+              {task.history.slice().reverse().map((h, i) => (
+                <li key={i} className={theme === 'dark' ? 'text-neutral-300' : 'text-neutral-700'}>
+                  <div className="text-xs text-neutral-500">{format(new Date(h.timestamp), 'MMM d, yyyy HH:mm')}</div>
+                  <div>{h.message}</div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </Modal>
