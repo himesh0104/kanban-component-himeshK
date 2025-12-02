@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --project-token=chpt_bc9d6b2768013c1"
   },
   "dependencies": {
     "clsx": "^2.1.0",
@@ -29,6 +30,7 @@
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.16",
+    "chromatic": "^13.3.4",
     "postcss": "^8.4.32",
     "storybook": "^7.6.0",
     "tailwindcss": "^3.4.0",
